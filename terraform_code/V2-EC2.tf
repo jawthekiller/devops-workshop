@@ -1,19 +1,12 @@
-provider "aws"{
-    region = "us-east-1"
-}
-resource "aws_instance" "demo-server"{
-    ami = "ami-0bb84b8ffd87024d8"
-    instance_type = "t2.micro"
-    key_name = "devtest"
-    security_groups = ["demo-sg"]
+provider "aws" {
+  region = "us-east-1"
 }
 
 resource "aws_security_group" "demo-test" {
   name        = "demo-test"
-  description = "SSh access"
- 
+  description = "SSH access"
 
-   ingress {
+  ingress {
     description      = "SSH access"
     from_port        = 22
     to_port          = 22
@@ -21,7 +14,7 @@ resource "aws_security_group" "demo-test" {
     cidr_blocks      = ["0.0.0.0/0"]
   }
 
-    egress {
+  egress {
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
@@ -34,3 +27,15 @@ resource "aws_security_group" "demo-test" {
   }
 }
 
+resource "aws_instance" "demo-server" {
+  ami           = "ami-0bb84b8ffd87024d8"
+  instance_type = "t2.micro"
+  key_name      = "devtest"
+  
+  # Use the security group ID
+  vpc_security_group_ids = [aws_security_group.demo-test.id]
+
+  tags = {
+    Name = "Demo Server"
+  }
+}
